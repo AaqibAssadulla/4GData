@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pulwama VLAN Data</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prop-types/15.8.1/prop-types.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+  <script src="https://unpkg.com/papaparse@latest/papaparse.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col items-center p-4">
+  <div id="root"></div>
+
+  <script type="text/babel">
+    // Defining the main App component
+    const App = () => {
+      const [data, setData] = React.useState([]);
+      const [searchTerm, setSearchTerm] = React.useState('');
+      const [isLoading, setIsLoading] = React.useState(true);
+
+      // Loading and parsing the CSV data
+      React.useEffect(() => {
+        Papa.parse(loadFileData("Pulwama 4G Tejas IP PLAN.xlsx"), {
+          header: true,
+          skipEmptyLines: true,
+          transformHeader: (header) => header.trim().replace(/^"|"$/g, ''),
+          transform: (value, header) => {
+            let cleaned = value.trim().replace(/^"|"$/g, '');
+            return cleaned;
+          },
+          complete: (results) => {
+            const cleanedData = results.data.map(row => ({
+              ...row,
+              // Ensuring all fields are strings for consistent search
+              Sno: String(row["Sno"] || ''),
+              EMF_IP_ID: String(row["EMF IP_ID"] || ''),
+              "4G_Site_ID": String(row["4G Site ID"] || ''),
+              Node_ID: String(row["Node ID"] || ''),
+              Site_Name: String(row["Site Name"] || ''),
+              Lat: String(row["Lat"] || ''),
+              Long: String(row["Long"] || ''),
+              CEF: String(row["CEF"] || ''),
+              VLAN: String(row["VLAN"] || ''),
+              OAM_RAC_B1: String(row["OAM RAC B1(L2100)"] || ''),
+              OAM_RAC_B28: String(row["OAM RAC B28(L700)"] || ''),
+              S1C_B1: String(row["S1C B1(L2100)"] || ''),
+              S1C_B28: String(row["S1C B28(L700)"] || ''),
+              S1U_B1: String(row["S1U B1(L2100)"] || ''),
+              S1U_B28: String(row["S1U B28(L700)"] || '')
+            }));
+            setData(cleanedData);
+            setIsLoading(false);
+          },
+          error: (err) => {
+            console.error(err);
+            setIsLoading(false);
+          }
+        });
+      }, []);
+
+      // Handling search input changes
+      const handleSearch = (event) => {
+        setSearchTerm(event.target.value);
+      };
+
+      // Filtering data based on search term
+      const filteredData = data.filter(row =>
+        Object.values(row).some(value =>
+          value.toLowerCase().includes(searchTerm.toLowerCase())
+        )
+      );
+
+      // Rendering the component
+      return (
+        <div className="w-full max-w-7xl bg-white rounded-lg shadow-lg p-6">
+          <h1 className="text-3xl font-bold text-gray-800 mb-6 text-center">Pulwama VLAN Data</h1>
+          
+          {/* Adding search input */}
+          <div className="mb-4">
+            <input
+              type="text"
+              placeholder="Search by any field..."
+              value={searchTerm}
+              onChange={handleSearch}
+              className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+
+          {/* Displaying loading message */}
+          {isLoading ? (
+            <p className="text-center text-gray-500">Loading data...</p>
+          ) : (
+            /* Rendering responsive table */
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm text-left text-gray-700">
+                <thead className="text-xs uppercase bg-gray-200">
+                  <tr>
+                    {[
+                      'Sno', 'EMF IP_ID', '4G Site ID', 'Node ID', 'Site Name', 
+                      'Lat', 'Long', 'CEF', 'VLAN', 'OAM RAC B1(L2100)', 
+                      'OAM RAC B28(L700)', 'S1C B1(L2100)', 'S1C B28(L700)', 
+                      'S1U B1(L2100)', 'S1U B28(L700)'
+                    ].map(header => (
+                      <th key={header} className="px-4 py-3">{header}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredData.length === 0 ? (
+                    <tr>
+                      <td colSpan="15" className="text-center py-4">No matching records found</td>
+                    </tr>
+                  ) : (
+                    filteredData.map((row, index) => (
+                      <tr key={index} className="border-b hover:bg-gray-50">
+                        <td className="px-4 py-2">{row.Sno}</td>
+                        <td className="px-4 py-2">{row.EMF_IP_ID}</td>
+                        <td className="px-4 py-2">{row["4G_Site_ID"]}</td>
+                        <td className="px-4 py-2">{row.Node_ID}</td>
+                        <td className="px-4 py-2">{row.Site_Name}</td>
+                        <td className="px-4 py-2">{row.Lat}</td>
+                        <td className="px-4 pretty-2">{row.Long}</td>
+                        <td className="px-4 py-2">{row.CEF}</td>
+                        <td className="px-4 py-2">{row.VLAN}</td>
+                        <td className="px-4 py-2">{row.OAM_RAC_B1}</td>
+                        <td className="px-4 py-2">{row.OAM_RAC_B28}</td>
+                        <td className="px-4 py-2">{row.S1C_B1}</td>
+                        <td className="px-4 py-2">{row.S1C_B28}</td>
+                        <td className="px-4 py-2">{row.S1U_B1}</td>
+                        <td className="px-4 py-2">{row.S1U_B28}</td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      );
+    };
+
+    // Rendering the app using createRoot
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body>
+</html>
