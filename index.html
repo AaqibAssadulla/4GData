@@ -4,89 +4,139 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Pulwama VLAN Data</title>
+  <script src="https://cdn.jsdelivr.net/npm/react@18.2.0/umd/react.production.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/react-dom@18.2.0/umd/react-dom.production.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@babel/standalone@7.22.9/babel.min.js"></script>
   <style>
-    /* Minimal Tailwind-inspired CSS */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
     body {
-      background-color: #f3f4f6;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 16px;
       font-family: Arial, sans-serif;
+      line-height: 1.6;
+      background-color: #f3f4f6;
     }
     .container {
-      width: 100%;
-      max-width: 1280px;
-      background-color: white;
-      border-radius: 8px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-      padding: 24px;
+      max-width: 100%;
+      margin: 1rem auto;
+      padding: 0 1rem;
     }
     .title {
-      font-size: 1.875rem;
-      font-weight: 700;
+      font-size: 1.5rem;
+      font-weight: bold;
       color: #1f2937;
-      margin-bottom: 24px;
       text-align: center;
+      margin-bottom: 1rem;
     }
-    .search-input {
-      width: 100%;
-      padding: 8px;
+    .search-container {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+    .search-input, .filter-select, .export-button {
+      padding: 0.5rem;
       border: 1px solid #d1d5db;
-      border-radius: 4px;
-      outline: none;
-      margin-bottom: 16px;
+      border-radius: 0.375rem;
+      font-size: 0.875rem;
+      width: 100%;
     }
-    .search-input:focus {
+    .search-input:focus, .filter-select:focus {
+      outline: none;
       border-color: #3b82f6;
-      box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+    }
+    .export-button {
+      background-color: #3b82f6;
+      color: white;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    .export-button:hover {
+      background-color: #1d4ed8;
     }
     .table-container {
       overflow-x: auto;
+      background-color: white;
+      border-radius: 0.375rem;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     }
     table {
       width: 100%;
-      font-size: 0.875rem;
-      color: #4b5563;
       border-collapse: collapse;
+      font-size: 0.75rem;
     }
     th, td {
-      padding: 12px;
+      padding: 0.5rem;
       text-align: left;
+      border-bottom: 1px solid #e5e7eb;
     }
     th {
-      font-size: 0.75rem;
-      text-transform: uppercase;
-      background-color: #e5e7eb;
+      background-color: #f9fafb;
+      font-weight: bold;
+      cursor: pointer;
+      white-space: nowrap;
     }
-    tr {
-      border-bottom: 1px solid #e5e7eb;
+    th:hover {
+      background-color: #e5e7eb;
     }
     tr:hover {
       background-color: #f9fafb;
     }
-    td.text-center {
+    .sort-icon {
+      margin-left: 0.25rem;
+      display: inline-block;
+    }
+    .text-center {
       text-align: center;
     }
-    @media (max-width: 640px) {
-      th, td {
-        padding: 8px;
-        font-size: 0.75rem;
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      border: 0;
+    }
+    @media (min-width: 640px) {
+      .container {
+        max-width: 90%;
+        padding: 0 2rem;
       }
       .title {
-        font-size: 1.5rem;
+        font-size: 1.875rem;
+      }
+      .search-container {
+        flex-direction: row;
+        align-items: center;
+      }
+      .search-input, .filter-select {
+        width: auto;
+        flex: 1;
+      }
+      .export-button {
+        width: auto;
+        padding: 0.5rem 1rem;
+      }
+      table {
+        font-size: 0.875rem;
+      }
+      th, td {
+        padding: 0.75rem;
       }
     }
   </style>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
 </head>
 <body>
   <div id="root"></div>
-  <script>
-    // Data from Pulwama VLAN sheet (subset for brevity; include all rows in practice)
-    const pulwamaData = [
+  <script type="text/babel">
+    // Placeholder for pulwamaData - Paste your JSON object here
+     const pulwamaData = [
       {"Sno":"1","EMF_IP_ID":"JAGT11294","4G_Site_ID":"T4JK01SNPWMP09T11294","Node_ID":"120184","Site_Name":"Jk Cements Khrew","Lat":"34.03077","Long":"75.01093","CEF":"10.140.190.178","VLAN":"463","OAM_RAC_B1(L2100)":"10.140.191.226","OAM_RAC_B28(L700)":"10.140.191.227","S1C_B1(L2100)":"10.140.192.226","S1C_B28(L700)":"10.140.192.227","S1U_B1(L2100)":"10.140.193.226","S1U_B28(L700)":"10.140.193.227"},
       {"Sno":"2","EMF_IP_ID":"JKSRIN00063092","4G_Site_ID":"T4JK01SNPWMP09063092","Node_ID":"120994","Site_Name":"Lethpora Exchange","Lat":"33.96669","Long":"74.96075","CEF":"10.140.190.179","VLAN":"463","OAM_RAC_B1(L2100)":"10.140.191.229","OAM_RAC_B28(L700)":"10.140.191.230","S1C_B1(L2100)":"10.140.192.229","S1C_B28(L700)":"10.140.192.230","S1U_B1(L2100)":"10.140.193.229","S1U_B28(L700)":"10.140.193.230"},
       {"Sno":"3","EMF_IP_ID":"JKSRIN00063083","4G_Site_ID":"T4JK01SNPWMP09063083","Node_ID":"120986","Site_Name":"Khrew","Lat":"34.01765","Long":"75.00221","CEF":"10.140.190.180","VLAN":"463","OAM_RAC_B1(L2100)":"10.140.191.232","OAM_RAC_B28(L700)":"10.140.191.233","S1C_B1(L2100)":"10.140.192.232","S1C_B28(L700)":"10.140.192.233","S1U_B1(L2100)":"10.140.193.232","S1U_B28(L700)":"10.140.193.233"},
@@ -248,84 +298,147 @@
       {"Sno":"10","EMF_IP_ID":"","4G_Site_ID":"","Node_ID":"","Site_Name":"","Lat":"","Long":"","CEF":"10.141.23.203","VLAN":"1435","OAM_RAC_B1(L2100)":"10.141.27.157","OAM_RAC_B28(L700)":"10.141.27.158","S1C_B1(L2100)":"10.141.28.157","S1C_B28(L700)":"10.141.28.158","S1U_B1(L2100)":"10.141.29.157","S1U_B28(L700)":"10.141.29.158"}
     ];
 
-    // Define headers
-    const headers = [
-      'Sno', 'EMF_IP_ID', '4G_Site_ID', 'Node_ID', 'Site_Name',
-      'Lat', 'Long', 'CEF', 'VLAN', 'OAM_RAC_B1(L2100)',
-      'OAM_RAC_B28(L700)', 'S1C_B1(L2100)', 'S1C_B28(L700)',
-      'S1U_B1(L2100)', 'S1U_B28(L700)'
-    ];
+    const headers = Object.keys(pulwamaData[0] || {});
 
-    // App component using createElement
-    const App = () => {
+    function debounce(func, delay) {
+      let timeoutId;
+      return (...args) => {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => func(...args), delay);
+      };
+    }
+
+    function downloadCSV(data, filename) {
+      const csv = [
+        headers.join(','),
+        ...data.map(row =>
+          headers
+            .map(header => `"${(row[header] || 'N/A').toString().replace(/"/g, '""')}"`)
+            .join(',')
+        )
+      ].join('\n');
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function App() {
       const [searchTerm, setSearchTerm] = React.useState('');
+      const [filterColumn, setFilterColumn] = React.useState('all');
+      const [sortConfig, setSortConfig] = React.useState({ key: null, direction: 'asc' });
 
-      // Filter data based on search term
-      const filteredData = pulwamaData.filter(row =>
-        Object.values(row).some(value =>
-          value.toLowerCase().includes(searchTerm.toLowerCase())
-        )
-      );
+      const debouncedSetSearchTerm = debounce(setSearchTerm, 300);
 
-      return React.createElement(
-        'div',
-        { className: 'container' },
-        React.createElement('h1', { className: 'title' }, 'Pulwama VLAN Data'),
-        React.createElement(
-          'div',
-          { className: 'mb-4' },
-          React.createElement('input', {
-            type: 'text',
-            placeholder: 'Search by any field...',
-            value: searchTerm,
-            onChange: (e) => setSearchTerm(e.target.value),
-            className: 'search-input'
-          })
-        ),
-        React.createElement(
-          'div',
-          { className: 'table-container' },
-          React.createElement(
-            'table',
-            null,
-            React.createElement(
-              'thead',
-              null,
-              React.createElement(
-                'tr',
-                null,
-                headers.map(header =>
-                  React.createElement('th', { key: header }, header.replace(/\(L\d+\)/g, ''))
-                )
+      const filteredData = React.useMemo(() => {
+        return pulwamaData.filter(row =>
+          filterColumn === 'all'
+            ? Object.values(row).some(value =>
+                value?.toString().toLowerCase().includes(searchTerm.toLowerCase())
               )
-            ),
-            React.createElement(
-              'tbody',
-              null,
-              filteredData.length === 0
-                ? React.createElement(
-                    'tr',
-                    null,
-                    React.createElement('td', { colSpan: headers.length, className: 'text-center' }, 'No matching records found')
-                  )
-                : filteredData.map((row, index) =>
-                    React.createElement(
-                      'tr',
-                      { key: index, className: 'border-b hover:bg-gray-50' },
-                      headers.map(header =>
-                        React.createElement('td', { key: header }, row[header])
-                      )
-                    )
-                  )
-            )
-          )
-        )
-      );
-    };
+            : row[filterColumn]?.toString().toLowerCase().includes(searchTerm.toLowerCase())
+        );
+      }, [searchTerm, filterColumn]);
 
-    // Render the app
-    const root = ReactDOM.createRoot(document.getElementById('root'));
-    root.render(React.createElement(App));
+      const sortedData = React.useMemo(() => {
+        if (!sortConfig.key) return filteredData;
+        return [...filteredData].sort((a, b) => {
+          const aValue = a[sortConfig.key] || '';
+          const bValue = b[sortConfig.key] || '';
+          return sortConfig.direction === 'asc'
+            ? aValue.toString().localeCompare(bValue.toString())
+            : bValue.toString().localeCompare(aValue.toString());
+        });
+      }, [filteredData, sortConfig]);
+
+      const handleSort = (key) => {
+        setSortConfig({
+          key,
+          direction: sortConfig.key === key && sortConfig.direction === 'asc' ? 'desc' : 'asc'
+        });
+      };
+
+      return (
+        <div className="container">
+          <h1 className="title">Pulwama VLAN Data</h1>
+          <div className="search-container">
+            <label htmlFor="search-input" className="sr-only">Search VLAN data</label>
+            <input
+              id="search-input"
+              type="text"
+              placeholder="Search by any field..."
+              onChange={e => debouncedSetSearchTerm(e.target.value)}
+              className="search-input"
+              aria-label="Search VLAN data"
+            />
+            <select
+              value={filterColumn}
+              onChange={e => setFilterColumn(e.target.value)}
+              className="filter-select"
+              aria-label="Select column to filter"
+            >
+              <option value="all">All Fields</option>
+              {headers.map(header => (
+                <option key={header} value={header}>
+                  {header.replace(/\(L\d+\)/g, '')}
+                </option>
+              ))}
+            </select>
+            <button
+              onClick={() => downloadCSV(sortedData, 'pulwama_vlan_data.csv')}
+              className="export-button"
+            >
+              Export to CSV
+            </button>
+          </div>
+          <div className="table-container">
+            <table role="grid">
+              <thead>
+                <tr>
+                  {headers.map(header => (
+                    <th
+                      key={header}
+                      onClick={() => handleSort(header)}
+                      scope="col"
+                      aria-sort={sortConfig.key === header ? sortConfig.direction : 'none'}
+                    >
+                      {header.replace(/\(L\d+\)/g, '')}
+                      {sortConfig.key === header && (
+                        <span className="sort-icon">
+                          {sortConfig.direction === 'asc' ? '↑' : '↓'}
+                        </span>
+                      )}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {sortedData.length === 0 ? (
+                  <tr>
+                    <td colSpan={headers.length} className="text-center">
+                      No matching records found
+                    </td>
+                  </tr>
+                ) : (
+                  sortedData.map((row, index) => (
+                    <tr key={index}>
+                      {headers.map(header => (
+                        <td key={header}>{row[header] || 'N/A'}</td>
+                      ))}
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      );
+    }
+
+    ReactDOM.render(<App />, document.getElementById('root'));
   </script>
 </body>
 </html>
